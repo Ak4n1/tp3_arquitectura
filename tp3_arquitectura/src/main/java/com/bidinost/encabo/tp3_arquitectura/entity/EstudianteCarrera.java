@@ -1,5 +1,6 @@
 package com.bidinost.encabo.tp3_arquitectura.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -28,10 +29,12 @@ public class EstudianteCarrera implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "estudiante_id", insertable = false, updatable = false)
+    @JsonIgnoreProperties({"inscripciones"})
     private Estudiante estudiante;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "carrera_id", insertable = false, updatable = false)
+    @JsonIgnoreProperties({"estudiantesInscritos"})
     private Carrera carrera;
 
     public EstudianteCarrera() {

@@ -1,10 +1,17 @@
 package com.bidinost.encabo.tp3_arquitectura.service;
 
 import com.bidinost.encabo.tp3_arquitectura.dto.RequestEstudianteDTO;
+import com.bidinost.encabo.tp3_arquitectura.dto.ResponseEstudianteDTO;
 import com.bidinost.encabo.tp3_arquitectura.entity.Estudiante;
 import com.bidinost.encabo.tp3_arquitectura.exception.DuplicateResourceException;
 import com.bidinost.encabo.tp3_arquitectura.exception.ValidationException;
 import com.bidinost.encabo.tp3_arquitectura.repository.EstudianteRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +20,9 @@ public class ServiceEstudianteImpl implements ServiceEstudiante {
 
     @Autowired
     private EstudianteRepository estudianteRepository;
+    
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public Estudiante crearEstudiante(RequestEstudianteDTO request) {
@@ -41,6 +51,23 @@ public class ServiceEstudianteImpl implements ServiceEstudiante {
         estudiante.setNumeroLibretaUniversitaria(request.getNumeroLibretaUniversitaria());
 
         return estudianteRepository.save(estudiante);
+    }
+    //retorna un listado de estudiantes convertido en dto segun un criterio
+    //criterio:DESC o ASC
+    @Override
+    public List<ResponseEstudianteDTO> obtenerTodosLosEstudiantes(String criterio) {
+        List<Estudiante> estudiantes;
+        if (criterio.equalsIgnoreCase("DESC")) {
+            estudiantes = estudianteRepository.obtenerTodosLosEstudiantesDesc();
+        } else if (criterio.equalsIgnoreCase("ASC")) {
+            estudiantes = estudianteRepository.obtenerTodosLosEstudiantesAsc();
+        } else {
+            throw new IllegalArgumentException("El criterio debe ser DESC o ASC");
+        }
+        
+        return estudiantes.stream()
+                .map(ResponseEstudianteDTO::new)
+                .collect(Collectors.toList());
     }
 
     private void validarDatosEstudiante(RequestEstudianteDTO request) {

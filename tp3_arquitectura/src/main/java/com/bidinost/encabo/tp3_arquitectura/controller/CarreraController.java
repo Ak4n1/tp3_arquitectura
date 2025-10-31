@@ -22,14 +22,19 @@ public class CarreraController {
         return serviceCarrera.obtenerTodasLasCarreras();
     }
 
+    @PostMapping("/crear")
+    public Map<String, String> crearCarrera(@Valid @RequestBody RequestCrearCarreraDTO request) {
+        return serviceCarrera.crearCarrera(request);
+    }
+
+    @PostMapping("/matricular")
+    public Map<String, String> matricularEstudiante(@RequestBody RequestMatricularEstudiante request) {
+        return serviceCarrera.matricularEstudiante(request);
+    }
+
     @GetMapping("/{id}")
     public Map<String, Object> obtenerCarreraPorId(@PathVariable Long id) {
         return serviceCarrera.obtenerCarreraPorId(id);
-    }
-
-    @PostMapping
-    public Map<String, String> crearCarrera(@Valid @RequestBody RequestCrearCarreraDTO request) {
-        return serviceCarrera.crearCarrera(request);
     }
 
     @PutMapping("/{id}")
@@ -40,11 +45,6 @@ public class CarreraController {
     @DeleteMapping("/{id}")
     public Map<String, String> eliminarCarrera(@PathVariable Long id) {
         return serviceCarrera.eliminarCarrera(id);
-    }
-
-    @PostMapping("/matricular")
-    public Map<String, String> matricularEstudiante(@RequestBody RequestMatricularEstudiante request) {
-        return serviceCarrera.matricularEstudiante(request);
     }
 }
 
