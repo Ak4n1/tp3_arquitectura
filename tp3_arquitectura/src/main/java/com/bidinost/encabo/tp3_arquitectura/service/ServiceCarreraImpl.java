@@ -1,8 +1,12 @@
 package com.bidinost.encabo.tp3_arquitectura.service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -12,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import com.bidinost.encabo.tp3_arquitectura.dto.RequestCrearCarreraDTO;
 import com.bidinost.encabo.tp3_arquitectura.dto.RequestMatricularEstudiante;
+import com.bidinost.encabo.tp3_arquitectura.dto.ResponseCarreraDTO;
+import com.bidinost.encabo.tp3_arquitectura.dto.ReporteCarreraDTO;
 import com.bidinost.encabo.tp3_arquitectura.entity.Carrera;
 import com.bidinost.encabo.tp3_arquitectura.entity.Estudiante;
 import com.bidinost.encabo.tp3_arquitectura.entity.EstudianteCarrera;
@@ -198,6 +204,95 @@ public class ServiceCarreraImpl implements ServiceCarrera {
         respuesta.put("id", id.toString());
         
         return respuesta;
+    }
+    
+    @Override
+    public List<ResponseCarreraDTO> obtenerCarrerasConEstudiantesInscriptos() {
+        // Obtener carreras con estudiantes inscriptos
+        List<Carrera> carreras = carreraRepository.findCarrerasConEstudiantesInscriptos();
+        
+        // Convertir cada carrera a un DTO
+        //por cada elemento de la lista carreras, creo un responseCarreraDTO y lo agrego a la lista respuesta
+        List<ResponseCarreraDTO> respuesta = new ArrayList<>();
+        for (Carrera carrera : carreras) {
+            //creo un responseCarreraDTO para cada elemento de la lista carreras
+            respuesta.add(new ResponseCarreraDTO(carrera));
+        }
+        // Ordenar por cantidad de inscriptos descendente (de mayor a menor)
+        //uso el metodo sort para ordenar la lista respuesta por la cantidad de inscriptos de cada carrera
+        respuesta.sort((c1, c2) -> c2.getCantidadInscriptos().compareTo(c1.getCantidadInscriptos()));
+        //retorno la lista respuesta ya ordenada por la cantidad de inscriptos de cada carrera
+        return respuesta;
+    }
+    
+    @Override
+    public List<ReporteCarreraDTO> obtenerReporteCarreras() {
+        // Obtener todas las carreras con sus inscripciones, ordenadas alfabéticamente
+        List<Carrera> carreras = carreraRepository.findAllConInscripcionesOrdenadasAlfabeticamente();
+        
+        List<ReporteCarreraDTO> reporte = new ArrayList<>();
+        
+        // Por cada carrera, procesar sus inscripciones
+        for (Carrera carrera : carreras) {
+            // Map para contar inscriptos por año
+            Map<Integer, Integer> inscriptosPorAnio = new HashMap<>();
+            // Map para contar egresados por año
+            Map<Integer, Integer> egresadosPorAnio = new HashMap<>();
+            
+            // Procesar cada inscripción de la carrera
+            for (EstudianteCarrera inscripcion : carrera.getEstudiantesInscritos()) {
+                // Obtener el año de inscripción
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(inscripcion.getFechaInscripcion());
+                int anioInscripcion = cal.get(Calendar.YEAR);
+                
+                // Contar inscripto para ese año
+                inscriptosPorAnio.put(anioInscripcion, 
+                    inscriptosPorAnio.getOrDefault(anioInscripcion, 0) + 1);
+                
+                // Si está graduado, calcular año estimado de egreso
+                if (inscripcion.getGraduado() != null && inscripcion.getGraduado()) {
+                    // Año de egreso estimado = año de inscripción + antigüedad
+                    int anioEgreso = anioInscripcion + inscripcion.getAntiguedad();
+                    
+                    // Contar egresado para ese año
+                    egresadosPorAnio.put(anioEgreso, 
+                        egresadosPorAnio.getOrDefault(anioEgreso, 0) + 1);
+                }
+            }
+            
+            // Ordenar los años cronológicamente (de menor a mayor)
+            // Crear listas de años ordenadas
+            List<Integer> aniosInscriptos = new ArrayList<>(inscriptosPorAnio.keySet());
+            Collections.sort(aniosInscriptos);
+            
+            List<Integer> aniosEgresados = new ArrayList<>(egresadosPorAnio.keySet());
+            Collections.sort(aniosEgresados);
+            
+            // Crear Maps ordenados con LinkedHashMap (mantiene el orden de inserción)
+            Map<Integer, Integer> inscriptosOrdenados = new LinkedHashMap<>();
+            for (Integer anio : aniosInscriptos) {
+                inscriptosOrdenados.put(anio, inscriptosPorAnio.get(anio));
+            }
+            
+            Map<Integer, Integer> egresadosOrdenados = new LinkedHashMap<>();
+            for (Integer anio : aniosEgresados) {
+                egresadosOrdenados.put(anio, egresadosPorAnio.get(anio));
+            }
+            
+            // Crear el DTO del reporte para esta carrera
+            ReporteCarreraDTO reporteCarrera = new ReporteCarreraDTO(
+                carrera.getId(),
+                carrera.getNombre(),
+                carrera.getFacultad(),
+                inscriptosOrdenados,
+                egresadosOrdenados
+            );
+            
+            reporte.add(reporteCarrera);
+        }
+        
+        return reporte;
     }
     
 }

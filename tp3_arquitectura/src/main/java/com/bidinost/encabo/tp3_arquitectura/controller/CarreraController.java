@@ -2,6 +2,8 @@ package com.bidinost.encabo.tp3_arquitectura.controller;
 
 import com.bidinost.encabo.tp3_arquitectura.dto.RequestCrearCarreraDTO;
 import com.bidinost.encabo.tp3_arquitectura.dto.RequestMatricularEstudiante;
+import com.bidinost.encabo.tp3_arquitectura.dto.ResponseCarreraDTO;
+import com.bidinost.encabo.tp3_arquitectura.dto.ReporteCarreraDTO;
 import com.bidinost.encabo.tp3_arquitectura.service.ServiceCarrera;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,18 @@ public class CarreraController {
     @DeleteMapping("/{id}")
     public Map<String, String> eliminarCarrera(@PathVariable Long id) {
         return serviceCarrera.eliminarCarrera(id);
+    }
+
+    @GetMapping("/por-cantidad-inscriptos")
+    //la url es /carreras/por-cantidad-inscriptos para obtener carreras con estudiantes inscriptos ordenadas por cantidad
+    public List<ResponseCarreraDTO> obtenerCarrerasConEstudiantesInscriptos() {
+        return serviceCarrera.obtenerCarrerasConEstudiantesInscriptos();
+    }
+    
+    @GetMapping("/reporte")
+    //la url es /carreras/reporte para obtener un reporte de carreras con inscriptos y egresados por año
+    public List<ReporteCarreraDTO> obtenerReporteCarreras() {
+        return serviceCarrera.obtenerReporteCarreras();
     }
 }
 

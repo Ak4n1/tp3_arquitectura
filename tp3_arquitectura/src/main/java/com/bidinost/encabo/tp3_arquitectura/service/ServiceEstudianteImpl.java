@@ -4,9 +4,12 @@ import com.bidinost.encabo.tp3_arquitectura.dto.RequestEstudianteDTO;
 import com.bidinost.encabo.tp3_arquitectura.dto.ResponseEstudianteDTO;
 import com.bidinost.encabo.tp3_arquitectura.entity.Estudiante;
 import com.bidinost.encabo.tp3_arquitectura.exception.DuplicateResourceException;
+import com.bidinost.encabo.tp3_arquitectura.exception.ResourceNotFoundException;
 import com.bidinost.encabo.tp3_arquitectura.exception.ValidationException;
+import com.bidinost.encabo.tp3_arquitectura.repository.CarreraRepository;
 import com.bidinost.encabo.tp3_arquitectura.repository.EstudianteRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +23,9 @@ public class ServiceEstudianteImpl implements ServiceEstudiante {
 
     @Autowired
     private EstudianteRepository estudianteRepository;
+    
+    @Autowired
+    private CarreraRepository carreraRepository;
     
     @PersistenceContext
     private EntityManager entityManager;
@@ -68,6 +74,60 @@ public class ServiceEstudianteImpl implements ServiceEstudiante {
         return estudiantes.stream()
                 .map(ResponseEstudianteDTO::new)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public ResponseEstudianteDTO obtenerEstudiantePorLibreta(Integer numeroLibretaUniversitaria) {
+        Estudiante estudiante = estudianteRepository.findByNumeroLibretaUniversitaria(numeroLibretaUniversitaria);
+        if (estudiante == null) {
+            throw new ResourceNotFoundException(
+                    "No se encontró un estudiante con el número de libreta universitaria: " + numeroLibretaUniversitaria);
+        }
+        return new ResponseEstudianteDTO(estudiante);
+    }
+
+    @Override
+    public List<ResponseEstudianteDTO> obtenerEstudiantesPorGenero(String genero) {
+        // Validar que el género sea válido
+        if (!genero.equals("Masculino") && 
+            !genero.equals("Femenino") && 
+            !genero.equals("Otro")) {
+            throw new ValidationException("El género debe ser: Masculino, Femenino u Otro.");
+        }
+        
+        List<Estudiante> estudiantes = estudianteRepository.findByGenero(genero);
+        
+        return estudiantes.stream()
+                .map(ResponseEstudianteDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ResponseEstudianteDTO> obtenerEstudiantesPorCarreraYCiudad(Long carreraId, String ciudadDeResidencia) {
+        // Validar que la carrera exista
+        if (carreraId == null) {
+            throw new ValidationException("El ID de carrera no puede ser nulo.");
+        }
+        
+        if (!carreraRepository.existsById(carreraId)) {
+            throw new ResourceNotFoundException("No se encontró una carrera con el ID: " + carreraId);
+        }
+        
+        // Validar que la ciudad de residencia no sea nula o vacía
+        if (ciudadDeResidencia == null || ciudadDeResidencia.trim().isEmpty()) {
+            throw new ValidationException("La ciudad de residencia no puede estar vacía.");
+        }
+        
+        // Obtener estudiantes de la carrera filtrados por ciudad
+        List<Estudiante> estudiantes = estudianteRepository.findEstudiantesPorCarreraYCiudad(carreraId, ciudadDeResidencia);
+        
+        // Convertir cada estudiante a un DTO
+        List<ResponseEstudianteDTO> respuesta = new ArrayList<>();
+        for (Estudiante estudiante : estudiantes) {
+            respuesta.add(new ResponseEstudianteDTO(estudiante));
+        }
+        
+        return respuesta;
     }
 
     private void validarDatosEstudiante(RequestEstudianteDTO request) {

@@ -38,7 +38,27 @@ public class EstudianteController {
         return serviceEstudiante.obtenerTodosLosEstudiantes(criterio);
     }
     
-
+    @GetMapping("/libreta/{numeroLibreta}")
+    //solo un estudiante puede tener una sola libreta universitaria, por lo tanto va a devolver solo 1
+    //la url es /estudiantes/libreta/12345 para recuperar un estudiante por su número de libreta universitaria
+    public ResponseEstudianteDTO obtenerEstudiantePorLibreta(@PathVariable Integer numeroLibreta) {
+        return serviceEstudiante.obtenerEstudiantePorLibreta(numeroLibreta);
+    }
+    @GetMapping("/genero/{genero}")
+    //la url va a devolver todos los estudiantes en base a su genero
+    //la url es /estudiantes/genero/Masculino para obtener todos los estudiantes de ese género
+    public List<ResponseEstudianteDTO> obtenerEstudiantesPorGenero(@PathVariable String genero) {
+        return serviceEstudiante.obtenerEstudiantesPorGenero(genero);
+    }
+    
+    @GetMapping("/carrera/{carreraId}/ciudad/{ciudadDeResidencia}")
+    //la url es /estudiantes/carrera/1/ciudad/Buenos Aires para obtener estudiantes de esa carrera filtrados por ciudad
+    //si la ciudad tiene espacios en la URL se veria como %20 (ej: Buenos%20Aires)
+    public List<ResponseEstudianteDTO> obtenerEstudiantesPorCarreraYCiudad(
+            @PathVariable Long carreraId, 
+            @PathVariable String ciudadDeResidencia) {
+        return serviceEstudiante.obtenerEstudiantesPorCarreraYCiudad(carreraId, ciudadDeResidencia);
+    }
 
 }
 
