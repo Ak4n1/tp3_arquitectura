@@ -36,17 +36,28 @@ spring.datasource.password=tp3_password
 ---
 
 ## Lo que hice (matias):
--Creado el endpoint para ordenar estudiantes, integrado como dto para ignorar el error de serializacion porque la list estudiante contiene la relacion LAZY
--Mejora en el endpoint para que sea mas entendible, si estamos en estudiantes/ es obvio que despues vamos a ordenar estudiantantes, se evita el endpoint repetitivo
--Logica del endpoint pasada de controller (mala practica) al ServiceEstudiante
--Implementado el buscar por libreta universitaria, devuelve un solo estudiante porque cada libreta es unica
--Implementado el buscar por genero, devuelve todos los estudiantes de ese genero (Masculino, Femenino u Otro)
--Implementado buscar estudiantes de una carrera filtrados por ciudad de residencia, usando path variables para ambos parametros
--Implementado buscar carreras por cantidad de inscriptos ordenadas de manera descendente
--se creo un nuevo responseDto para carreras (ResponseCarreraDTO) para evitar problemas de lazy loading
--se implemento un metodo que inserta los elementos de la lista y lo convierte en una lista de dto asi no rompe (ServiceCarreraImp line 217)
--se creo ReporteCarreraDTO para el reporte de carreras con inscriptos y egresados por año no pude eliminar los espacios asique hay que poner %20 en caso de que exista una ciudad con espacios entre medio
--implementado el reporte de carreras que muestra inscriptos y egresados agrupados por año, ordena carreras alfabeticamente y los años
+
+- Creado el endpoint para ordenar estudiantes, integrado como dto para ignorar el error de serializacion porque la list estudiante contiene la relacion LAZY
+
+- Mejora en el endpoint para que sea mas entendible, si estamos en estudiantes/ es obvio que despues vamos a ordenar estudiantantes, se evita el endpoint repetitivo
+
+- Logica del endpoint pasada de controller (mala practica) al ServiceEstudiante
+
+- Implementado el buscar por libreta universitaria, devuelve un solo estudiante porque cada libreta es unica
+
+- Implementado el buscar por genero, devuelve todos los estudiantes de ese genero (Masculino, Femenino u Otro)
+
+- Implementado buscar estudiantes de una carrera filtrados por ciudad de residencia, usando path variables para ambos parametros
+
+- Implementado buscar carreras por cantidad de inscriptos ordenadas de manera descendente
+
+- Se creo un nuevo responseDto para carreras (ResponseCarreraDTO) para evitar problemas de lazy loading
+
+- Se implemento un metodo que inserta los elementos de la lista y lo convierte en una lista de dto asi no rompe (ServiceCarreraImp line 217)
+
+- Se creo ReporteCarreraDTO para el reporte de carreras con inscriptos y egresados por año, no pude eliminar los espacios asi que hay que poner %20 en caso de que exista una ciudad con espacios entre medio
+
+- Implementado el reporte de carreras que muestra inscriptos y egresados agrupados por año, ordena carreras alfabeticamente y los años cronologicamente
 
 
 
