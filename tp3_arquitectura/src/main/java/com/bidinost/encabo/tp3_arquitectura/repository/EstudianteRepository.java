@@ -20,7 +20,8 @@ public interface EstudianteRepository extends JpaRepository<Estudiante, Long> {
     List<Estudiante> obtenerTodosLosEstudiantesAsc();
     //query para obtener un estudiante por su número de libreta universitaria
     Estudiante findByNumeroLibretaUniversitaria(Integer numeroLibretaUniversitaria);
-    //query para obtener todos los estudiantes por género
+    //query para obtener todos los estudiantes por género (case-insensitive)
+    @Query("SELECT e FROM Estudiante e WHERE UPPER(e.genero) = UPPER(:genero)")
     List<Estudiante> findByGenero(String genero);
     //query para obtener estudiantes de una carrera filtrados por ciudad de residencia
     @Query("SELECT DISTINCT e FROM Estudiante e " +

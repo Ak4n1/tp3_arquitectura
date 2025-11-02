@@ -89,9 +89,9 @@ public class ServiceEstudianteImpl implements ServiceEstudiante {
     @Override
     public List<ResponseEstudianteDTO> obtenerEstudiantesPorGenero(String genero) {
         // Validar que el género sea válido
-        if (!genero.equals("Masculino") && 
-            !genero.equals("Femenino") && 
-            !genero.equals("Otro")) {
+        if (!genero.equalsIgnoreCase("Masculino") && 
+            !genero.equalsIgnoreCase("Femenino") && 
+            !genero.equalsIgnoreCase("Otro")) {
             throw new ValidationException("El género debe ser: Masculino, Femenino u Otro.");
         }
         
